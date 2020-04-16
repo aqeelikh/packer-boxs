@@ -1,0 +1,64 @@
+{
+    "builders": [
+        {
+            "type": "virtualbox-iso",
+            "boot_command": [
+                "{{user `boot_command_prefix`}}",
+                "/install/vmlinuz noapic ",
+                "initrd=/install/initrd.gz ",
+                "preseed/url=http://{{.HTTPIP}}:{{.HTTPPort}}/preseed.cfg",
+                "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+                "grub-installer/bootdev=/dev/sda<wait> ",
+                "fb=false debconf/frontend=noninteractive ",
+                "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+                "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+                "-- <enter>"
+            ],
+            "boot_wait": "10s",
+            "disk_size": 81920,
+            "guest_os_type": "Ubuntu_64",
+            "headless": false,
+            "http_directory": "http",
+            "iso_urls": [
+            "ubuntu-18.04.4-live-server-amd64.iso",
+            "https://releases.ubuntu.com/18.04.4/ubuntu-18.04.4-live-server-amd64.iso"
+            ],
+            "iso_checksum_type": "sha256",
+            "iso_checksum": "73b8d860e421000a6e35fdefbb0ec859b9385b0974cf8089f5d70a87de72f6b9",
+            "ssh_username": "vagrant",
+            "ssh_password": "",
+            "ssh_port": 22,
+            "ssh_wait_timeout": "10000s",
+            "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+            "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+            "virtualbox_version_file": ".vbox_version",
+            "vm_name": "ubuntu-server-18.04",
+            "vboxmanage": [
+            [
+                "modifyvm",
+                "{{.Name}}",
+                "--memory",
+                "4096"
+            ],
+            [
+                "modifyvm",
+                "{{.Name}}",
+                "--cpus",
+                "2"
+            ]
+            ]
+        }
+    ],
+    "provisioners": [{
+      "type": "shell",
+      "scripts": [
+        "scripts/init.sh",
+        "scripts/cleanup.sh"
+      ]
+    }],
+    "post-processors": [{
+      "type": "vagrant",
+      "compression_level": "8",
+      "output": "ubuntu-18.04-{{.Provider}}.box"
+    }]
+  }
